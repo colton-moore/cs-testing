@@ -6,9 +6,11 @@
   <title>Timer Chip</title>
   <style>
     :root{
-      /* === THEME === */
-      --accent:#B31E2D;            /* dark red */
-      --accent-light:#FCE6D8;      /* light orange */
+      /* === EASY COLOR KNOBS (edit these) === */
+      --accent:#B31E2D;        /* primary accent (dark red) */
+      --accent-light:#FCE6D8;  /* light accent (badge/bg) */
+
+      /* --- Usually fine to leave alone --- */
       --chip-border:#E6E6EA;
       --chip-shadow:0 6px 16px rgba(16,24,40,.08);
       --text:#2B2B2B; --muted:#8C8C94; --digit-bg:#F7F7FA;
@@ -17,20 +19,22 @@
     html,body{height:100%;margin:0;background:transparent;font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";color:var(--text)}
     .wrap{position:relative;width:100%;height:100%;min-height:80px;}
 
-    /* === Chip (collapsed) === */
-    .chip{position:absolute;bottom:8px;left:8px;display:flex;align-items:center;gap:.5rem;padding:.375rem .6rem;border:1px solid var(--chip-border);border-radius:999px;background:#fff;box-shadow:var(--chip-shadow);cursor:pointer;user-select:none}
+    /* === Bottom-left cluster that keeps chip + close button together === */
+    .cluster{position:absolute;bottom:8px;left:8px;display:flex;align-items:center;gap:6px;z-index:10}
+
+    /* === Chip === */
+    .chip{display:flex;align-items:center;gap:.5rem;padding:.375rem .6rem;border:1px solid var(--chip-border);border-radius:999px;background:#fff;box-shadow:var(--chip-shadow);cursor:pointer;user-select:none}
     .chip:active{transform:translateY(1px)}
     .chip .icon-wrap{display:grid;place-items:center}
-    /* Larger icon, no circular background behind it */
     .chip img{width:22px;height:22px;display:block}
     .chip .pill{display:inline-flex;align-items:center;font-variant-numeric:tabular-nums;letter-spacing:.5px;padding:.15rem .5rem;border-radius:10px;background:var(--accent-light);border:1px solid var(--accent);color:var(--accent);font-weight:600}
 
-    /* Dedicated close (×) button that appears next to the chip when panel is open */
-    .close-chip{position:absolute;bottom:8px;left:calc(8px + 100% + .5rem);display:none;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;border:1px solid var(--chip-border);background:#fff;box-shadow:var(--chip-shadow);cursor:pointer}
+    /* === Close (×) — appears only when panel is open === */
+    .close-chip{display:none;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;border:1px solid var(--chip-border);background:#fff;box-shadow:var(--chip-shadow);cursor:pointer}
     .close-chip svg{width:14px;height:14px}
     .close-chip.show{display:flex}
 
-    /* === Panel (expanded) === */
+    /* === Panel === */
     .panel{position:absolute;bottom:58px;left:8px;display:none;flex-direction:column;align-items:flex-start;gap:.6rem;border:1px solid var(--chip-border);border-radius:16px;background:#fff;box-shadow:0 20px 40px rgba(16,24,40,.14);padding:.85rem 1rem .9rem 1rem;transform-origin:bottom left;animation:pop .18s ease;max-width:fit-content}
     .panel.open{display:flex}
     @keyframes pop{from{transform:scale(.97);opacity:0}to{transform:scale(1);opacity:1}}
@@ -55,32 +59,31 @@
     <!--
       QUICK CUSTOMIZATION GUIDE
       ---------------------------------
-      1) Change DEFAULT_MINUTES below (JS) to 1 or 3 to set default timer length.
-         You can also pass ?min=1 or ?sec=60 in the URL.
-      2) Swap ICON_URL below (JS) or pass ?icon=<url> to use a different icon.
-      3) Colors are in :root CSS variables above (accent / accent-light).
+      1) JS: Set DEFAULT_MINUTES (e.g., 1, 2, 3). Or pass ?min=1 or ?sec=60.
+      2) JS: Replace ICON_URL with any SVG/PNG. Or pass ?icon=<url>.
+      3) CSS: Change --accent / --accent-light above for colors. Or use URL ?accent=#hex&accentLight=#hex.
     -->
 
-    <!-- Collapsed chip -->
-    <button class="chip" id="chip" aria-expanded="false" aria-controls="timer-panel">
-      <span class="icon-wrap" aria-hidden="true">
-        <img id="chip-icon" alt="" />
-      </span>
-      <span class="pill"><span class="vh" id="chip-label">Timer:</span><span id="chip-time">02:00</span></span>
-    </button>
-    <button class="close-chip" id="closeChip" aria-label="Close timer panel" title="Close">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" stroke="#9A9AA3" stroke-width="2" stroke-linecap="round"/></svg>
-    </button>
+    <!-- Collapsed chip + close button live together so they "hug" in the corner -->
+    <div class="cluster">
+      <button class="chip" id="chip" aria-expanded="false" aria-controls="timer-panel">
+        <span class="icon-wrap" aria-hidden="true">
+          <img id="chip-icon" alt="" />
+        </span>
+        <span class="pill"><span class="vh" id="chip-label">Timer:</span><span id="chip-time">02:00</span></span>
+      </button>
+      <button class="close-chip" id="closeChip" aria-label="Close timer panel" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" stroke="#9A9AA3" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
 
     <!-- Expanded panel -->
     <section class="panel" id="timer-panel" aria-hidden="true" role="group" aria-label="timer">
       <div class="head">
         <span class="icon-wrap" aria-hidden="true"><img alt="" id="panel-icon"/></span>
-        <div class="title" id="panel-title">Action — 1 minute</div>
+        <div class="title" id="panel-title">Discuss — 3 minutes</div>
       </div>
-
       <div class="lcd"><div class="screen" id="screen">02:00</div></div>
-
       <div class="controls">
         <button class="btn" id="play" aria-label="Pause timer" title="Pause">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M6 5h5v14H6zM13 5h5v14h-5z"/></svg>
@@ -97,17 +100,26 @@
     (function(){
       const qs=new URLSearchParams(location.search);
 
-      /* === EASY KNOBS === */
-      const DEFAULT_MINUTES = 1; // <-- change to 1 or 3 to set default
-      const ICON_URL = 'https://s3.amazonaws.com/media-p.slid.es/uploads/2912448/images/12376786/MS-Action.svg'; // <-- replace with any SVG/PNG
+      /* =====================
+         CONFIG — edit here
+         ===================== */
+      const DEFAULT_MINUTES = 1; // change to 1 or 3 (or pass ?min=1 / ?sec=60)
+      const ICON_URL = 'https://s3.amazonaws.com/media-p.slid.es/uploads/2912448/images/12376786/MS-Action.svg'; // swap to any SVG/PNG (or ?icon=...)
+      // Optional: override colors via URL like ?accent=%23B31E2D&accentLight=%23FCE6D8
+      const accentURL = qs.get('accent');
+      const accentLightURL = qs.get('accentLight');
+      if(accentURL) document.documentElement.style.setProperty('--accent', accentURL);
+      if(accentLightURL) document.documentElement.style.setProperty('--accent-light', accentLightURL);
 
-      // URL overrides
-      const secondsFromURL = qs.get('sec')? parseInt(qs.get('sec'),10)
-                           : (qs.get('min')? Math.round(parseFloat(qs.get('min'))*60) : NaN);
+      // URL overrides for time + label + icon
+      const secondsFromURL = qs.get('sec') ? parseInt(qs.get('sec'),10)
+                              : (qs.get('min') ? Math.round(parseFloat(qs.get('min'))*60) : NaN);
       const secondsDefault = Number.isFinite(secondsFromURL) && secondsFromURL>0 ? secondsFromURL : DEFAULT_MINUTES*60;
       const iconOverride = qs.get('icon');
-      const label = qs.get('label') || 'Action';
+      const label = qs.get('label') || 'Discuss';
 
+      // Elements
+      const cluster=document.querySelector('.cluster');
       const chip=document.getElementById('chip');
       const closeChip=document.getElementById('closeChip');
       const panel=document.getElementById('timer-panel');
@@ -126,10 +138,10 @@
 
       title.textContent = `${label} — ${Math.floor(secondsDefault/60)} minute${secondsDefault>=120?'s':''}`;
 
-      // Timer state using a moving target timestamp (so +1:00 works while running)
-      let remaining = secondsDefault;     // seconds remaining
-      let ticking = null;                 // interval id
-      let targetAt = null;                // timestamp (ms) when timer will hit 0
+      // Timer uses a moving deadline so +1:00 works while running
+      let remaining = secondsDefault; // seconds
+      let ticking = null;            // interval id
+      let targetAt = null;           // timestamp (ms) when timer hits 0
 
       function fmt(s){
         const m = Math.floor(s/60).toString().padStart(2,'0');
@@ -160,9 +172,7 @@
 
       function start(){
         if(ticking) return;
-        // If we haven't started yet, set targetAt from remaining
-        if(!targetAt) targetAt = Date.now() + remaining*1000;
-        // Update play icon to PAUSE
+        if(!targetAt) targetAt = Date.now() + remaining*1000; // on first start or after reset
         play.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M6 5h5v14H6zM13 5h5v14h-5z"/></svg>';
         play.setAttribute('aria-label','Pause');
         ticking = setInterval(()=>{
@@ -179,36 +189,26 @@
         play.setAttribute('aria-label','Start');
       }
 
-      function hardReset(){
-        stop(); remaining = secondsDefault; targetAt = null; render();
-      }
+      function hardReset(){ stop(); remaining = secondsDefault; targetAt = null; render(); }
 
-      // +1:00 extends targetAt whether running or paused
+      // +1:00 extends even while running; revives from 0
       add1.addEventListener('click', ()=>{
-        if(!targetAt){ // if never started or paused before start, extend remaining
-          remaining += 60; render();
-        } else {
-          targetAt += 60*1000; // push deadline out by 1 minute
-          const now = Date.now();
-          remaining = Math.max(0, Math.ceil((targetAt - now)/1000));
-          render();
-        }
-        // If at 0, revive and start
+        if(!targetAt){ remaining += 60; render(); }
+        else { targetAt += 60*1000; const now = Date.now(); remaining = Math.max(0, Math.ceil((targetAt - now)/1000)); render(); }
         if(remaining<=0){ targetAt = Date.now() + 60*1000; remaining = 60; render(); start(); }
       });
 
-      // Chip behavior: toggle panel only (running state unchanged). Opening autostarts.
+      // Chip toggles panel (auto-start on open). Close button always collapses.
       chip.addEventListener('click', ()=>{
         const isOpen = panel.classList.contains('open');
-        if(isOpen){ closePanel(); }
-        else { openPanel(); if(!ticking) start(); }
+        if(isOpen){ closePanel(); } else { openPanel(); if(!ticking) start(); }
       });
       closeChip.addEventListener('click', ()=> closePanel());
 
       play.addEventListener('click', ()=> ticking ? stop() : start());
       reset.addEventListener('click', hardReset);
 
-      // Respect optional URL flags
+      // Optional URL flags
       if(qs.get('open')==='1'){ openPanel(); }
       if(qs.get('auto')==='1'){ openPanel(); start(); }
     })();
