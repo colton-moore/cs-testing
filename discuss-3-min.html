@@ -26,19 +26,7 @@
     .chip .pill{display:inline-flex;align-items:center;font-variant-numeric:tabular-nums;letter-spacing:.5px;padding:.15rem .5rem;border-radius:10px;background:var(--accent-light);border:1px solid var(--accent);color:var(--accent);font-weight:600}
 
     /* Dedicated close (×) button that appears next to the chip when panel is open */
-    .close-chip{
-  bottom:8px;
-  left:calc(100% + 4px); /* closer to the chip */
-  display:none;
-  align-items:center;
-  justify-content:center;
-  width:28px;
-  height:28px;
-  border-radius:999px;
-  border:1px solid var(--chip-border);
-  background:#fff;
-  box-shadow:var(--chip-shadow);
-  cursor:pointer;}
+    .close-chip{position:absolute;bottom:8px;left:30px;display:flex;align-items:center;gap:.5rem;padding:.375rem .6rem;border:1px solid var(--chip-border);border-radius:999px;background:#fff;box-shadow:var(--chip-shadow);cursor:pointer;user-select:none}
     .close-chip svg{width:14px;height:14px}
     .close-chip.show{display:flex}
 
