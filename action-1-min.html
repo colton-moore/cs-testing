@@ -81,7 +81,7 @@
     <section class="panel" id="timer-panel" aria-hidden="true" role="group" aria-label="timer">
       <div class="head">
         <span class="icon-wrap" aria-hidden="true"><img alt="" id="panel-icon"/></span>
-        <div class="title" id="panel-title">Discuss — 3 minutes</div>
+        <div class="title" id="panel-title">Action — 1 minute</div>
       </div>
       <div class="lcd"><div class="screen" id="screen">02:00</div></div>
       <div class="controls">
@@ -116,7 +116,7 @@
                               : (qs.get('min') ? Math.round(parseFloat(qs.get('min'))*60) : NaN);
       const secondsDefault = Number.isFinite(secondsFromURL) && secondsFromURL>0 ? secondsFromURL : DEFAULT_MINUTES*60;
       const iconOverride = qs.get('icon');
-      const label = qs.get('label') || 'Discuss';
+      const label = qs.get('label') || 'Action';
 
       // Elements
       const cluster=document.querySelector('.cluster');
