@@ -1,0 +1,478 @@
+<!-- ==== TIMER COMPONENT ==== -->
+<div class="cs-timer" data-start-seconds="180">
+  <!-- Collapsed Stopwatch Button -->
+  <button class="cs-timer__stopwatch" id="csStopwatchBtn" aria-label="Open timer and start countdown">
+    <!-- Stopwatch background fill -->
+    <img
+      class="cs-timer__stopwatch-fill"
+      src="https://s3.amazonaws.com/media-p.slid.es/uploads/team-3032/images/12460410/CS_Slides_Stopwatch_Fill.svg"
+      alt=""
+      draggable="false"
+    />
+    <!-- Stopwatch outline overlay -->
+    <img
+      class="cs-timer__stopwatch-outline"
+      src="https://s3.amazonaws.com/media-p.slid.es/uploads/2912448/images/12460518/Stopwatch-outline-no-number.svg"
+      alt=""
+      draggable="false"
+    />
+    <!-- Time inside stopwatch -->
+    <div class="cs-timer__stopwatch-time" id="csStopwatchTime">03:00</div>
+  </button>
+
+  <!-- Expanded Panel -->
+  <section class="cs-timer__panel" id="csTimerPanel" aria-hidden="true">
+    <!-- Close button (X) -->
+    <button class="cs-timer__close-btn" id="csCloseBtn" aria-label="Close timer">
+      ✕
+    </button>
+
+    <!-- Main time display -->
+    <div class="cs-timer__time" id="csMainTime">03:00</div>
+
+    <!-- Controls row -->
+    <div class="cs-timer__controls-row">
+      <!-- Pause / Play -->
+      <button class="cs-timer__round-btn" id="csPausePlayBtn" aria-label="Pause timer">
+        <span id="csPausePlayIcon" class="cs-icon-pause">❚❚</span>
+      </button>
+
+      <!-- +30 SEC -->
+      <button class="cs-timer__pill-btn" id="csAdd30Btn" aria-label="Add 30 seconds">
+        +30 SEC
+      </button>
+
+      <!-- Reset / Restart -->
+      <button class="cs-timer__round-btn" id="csResetBtn" aria-label="Reset timer">
+        <span class="cs-icon-reset" aria-hidden="true">↻</span>
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- ==== STYLES ==== -->
+<style>
+  :root {
+    --cs-bg-panel: #f4f9ff;         /* very light blue */
+    --cs-border-panel: #cdd9ff;     /* soft periwinkle border */
+    --cs-accent-fill: #dbe5ff;      /* stopwatch + button fill */
+    --cs-text-dark: #0b1630;        /* near-black navy */
+    --cs-text-main: #000000;        /* main big digits */
+    --cs-radius-lg: 1.25rem;        /* ~20px */
+    --cs-radius-xl: 2rem;           /* ~32px for round buttons */
+    --cs-shadow-card: 0 8px 24px rgba(11, 22, 48, 0.06);
+    --cs-transition-fast: 0.18s ease;
+  }
+
+  .cs-timer {
+    position: relative;
+    display: inline-block;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    color: var(--cs-text-dark);
+    user-select: none;
+  }
+
+  /* -------------------- Collapsed Stopwatch -------------------- */
+  .cs-timer__stopwatch {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    outline-offset: 4px;
+    transition: filter var(--cs-transition-fast),
+      transform var(--cs-transition-fast);
+  }
+
+  /* subtle hover cue so students know it's clickable */
+  .cs-timer__stopwatch:hover {
+    filter: brightness(1.05);
+    transform: scale(1.02);
+  }
+
+  .cs-timer__stopwatch-fill,
+  .cs-timer__stopwatch-outline {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  /* time text in the center of stopwatch */
+  .cs-timer__stopwatch-time {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--cs-text-main);
+    pointer-events: none;
+  }
+
+  /* -------------------- Expanded Panel -------------------- */
+  .cs-timer__panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(-8px) translateX(calc(-100% - 24px));
+    /* sits to the left of stopwatch */
+    min-width: 500px;
+    max-width: 560px;
+    background-color: var(--cs-bg-panel);
+    border: 3px solid var(--cs-border-panel);
+    border-radius: var(--cs-radius-lg);
+    box-shadow: var(--cs-shadow-card);
+
+    padding: 3.5rem 2rem 2rem;
+    box-sizing: border-box;
+
+    /* show/hide animation */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--cs-transition-fast),
+      visibility var(--cs-transition-fast);
+    visibility: hidden;
+  }
+
+  .cs-timer__panel[aria-hidden="false"] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* Close button circle in top-left corner (like mock) */
+  .cs-timer__close-btn {
+    position: absolute;
+    top: -1.5rem;
+    left: -1.5rem;
+    width: 4rem;
+    height: 4rem;
+    background-color: var(--cs-accent-fill);
+    border: 3px solid var(--cs-border-panel);
+    border-radius: 50%;
+    box-shadow: var(--cs-shadow-card);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--cs-text-dark);
+
+    cursor: pointer;
+  }
+
+  .cs-timer__close-btn:hover {
+    filter: brightness(1.05);
+  }
+
+  /* Big time readout */
+  .cs-timer__time {
+    width: 100%;
+    text-align: center;
+    font-size: clamp(5rem, 5vw + 2rem, 7rem);
+    line-height: 1;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    color: var(--cs-text-main);
+  }
+
+  /* Controls row */
+  .cs-timer__controls-row {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    justify-content: center;
+  }
+
+  /* Round buttons: Pause/Play + Reset */
+  .cs-timer__round-btn {
+    width: 5rem;
+    height: 5rem;
+    min-width: 5rem;
+    min-height: 5rem;
+
+    background-color: var(--cs-accent-fill);
+    border-radius: var(--cs-radius-xl);
+    border: 0;
+    box-shadow: var(--cs-shadow-card);
+
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--cs-text-dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 3px solid var(--cs-border-panel);
+    transition: filter var(--cs-transition-fast),
+      transform var(--cs-transition-fast);
+  }
+
+  .cs-timer__round-btn:hover {
+    filter: brightness(1.07);
+    transform: scale(1.03);
+  }
+
+  /* +30 SEC pill button */
+  .cs-timer__pill-btn {
+    flex: 0 0 auto;
+    background-color: var(--cs-accent-fill);
+    border-radius: var(--cs-radius-xl);
+    border: 3px solid var(--cs-border-panel);
+    min-height: 5rem;
+    padding: 0 1.5rem;
+
+    font-size: 2.25rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--cs-text-dark);
+    box-shadow: var(--cs-shadow-card);
+    cursor: pointer;
+    transition: filter var(--cs-transition-fast),
+      transform var(--cs-transition-fast);
+  }
+
+  .cs-timer__pill-btn:hover {
+    filter: brightness(1.07);
+    transform: scale(1.03);
+  }
+
+  /* icons */
+  .cs-icon-pause {
+    font-size: 2rem;
+    font-weight: 600;
+    font-family: "Inter", system-ui, sans-serif;
+    line-height: 1;
+  }
+
+  .cs-icon-play {
+    display: inline-block;
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 600;
+  }
+
+  .cs-icon-reset {
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    transform: rotate(-20deg);
+  }
+
+  /* small-screen fallback */
+  @media (max-width: 600px) {
+    .cs-timer__panel {
+      position: fixed;
+      left: 50%;
+      top: 1rem;
+      transform: translateX(-50%);
+      max-width: 90vw;
+      min-width: 90vw;
+      padding: 4rem 1rem 1.5rem;
+    }
+
+    .cs-timer__time {
+      font-size: clamp(3.5rem, 4vw + 2rem, 6rem);
+    }
+
+    .cs-timer__controls-row {
+      gap: 0.75rem;
+    }
+
+    .cs-timer__round-btn,
+    .cs-timer__pill-btn {
+      min-height: 4rem;
+      height: 4rem;
+    }
+
+    .cs-timer__round-btn {
+      min-width: 4rem;
+      width: 4rem;
+    }
+
+    .cs-timer__pill-btn {
+      font-size: 1.5rem;
+      padding: 0 1rem;
+    }
+
+    .cs-icon-pause,
+    .cs-icon-play,
+    .cs-icon-reset {
+      font-size: 1.5rem;
+    }
+
+    .cs-timer__close-btn {
+      width: 3rem;
+      height: 3rem;
+      font-size: 1.25rem;
+      top: -1rem;
+      left: -1rem;
+    }
+  }
+</style>
+
+<!-- ==== SCRIPT ==== -->
+<script>
+  (function () {
+    const timerRoot = document.querySelector(".cs-timer");
+
+    // DOM refs
+    const stopwatchBtn = document.getElementById("csStopwatchBtn");
+    const panel = document.getElementById("csTimerPanel");
+    const closeBtn = document.getElementById("csCloseBtn");
+
+    const mainTimeEl = document.getElementById("csMainTime");
+    const stopwatchTimeEl = document.getElementById("csStopwatchTime");
+
+    const pausePlayBtn = document.getElementById("csPausePlayBtn");
+    const pausePlayIcon = document.getElementById("csPausePlayIcon");
+
+    const add30Btn = document.getElementById("csAdd30Btn");
+    const resetBtn = document.getElementById("csResetBtn");
+
+    // State
+    const INITIAL_SECONDS = parseInt(
+      timerRoot.getAttribute("data-start-seconds") || "180",
+      10
+    );
+    let remaining = INITIAL_SECONDS; // in seconds
+    let running = false;
+    let hasEverStarted = false;
+    let intervalId = null;
+
+    // Utility: convert seconds => MM:SS with leading zeros
+    function formatTime(totalSeconds) {
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      const minsStr = mins < 10 ? "0" + mins : "" + mins;
+      const secsStr = secs < 10 ? "0" + secs : "" + secs;
+      return minsStr + ":" + secsStr;
+    }
+
+    // Render both displays
+    function render() {
+      const display = formatTime(Math.max(remaining, 0));
+      mainTimeEl.textContent = display;
+      stopwatchTimeEl.textContent = display;
+    }
+
+    // Start ticking down
+    function startTimer() {
+      if (running) return;
+      running = true;
+      updatePausePlayIcon();
+      intervalId = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          remaining = 0;
+          stopTimer();
+        }
+        render();
+      }, 1000);
+    }
+
+    // Stop ticking
+    function stopTimer() {
+      running = false;
+      updatePausePlayIcon();
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    }
+
+    // Pause/Play icon swap
+    function updatePausePlayIcon() {
+      if (running) {
+        pausePlayIcon.textContent = "❚❚"; // pause symbol
+        pausePlayIcon.className = "cs-icon-pause";
+        pausePlayBtn.setAttribute("aria-label", "Pause timer");
+      } else {
+        pausePlayIcon.textContent = "▶"; // play symbol
+        pausePlayIcon.className = "cs-icon-play";
+        pausePlayBtn.setAttribute("aria-label", "Play timer");
+      }
+    }
+
+    // Reset
+    function resetTimer() {
+      remaining = INITIAL_SECONDS;
+      render();
+      stopTimer();
+      // after reset, icon should show Play
+    }
+
+    // +30 seconds
+    function add30() {
+      remaining += 30;
+      render();
+    }
+
+    // Open panel
+    function openPanelAndMaybeStart() {
+      panel.setAttribute("aria-hidden", "false");
+
+      // Auto-start ONLY first time user clicks stopwatch
+      if (!hasEverStarted) {
+        hasEverStarted = true;
+        startTimer();
+      }
+    }
+
+    // Close panel
+    function closePanel() {
+      panel.setAttribute("aria-hidden", "true");
+    }
+
+    // --------- Event Listeners ---------
+
+    // Clicking stopwatch:
+    // - opens panel
+    // - auto-starts if first time
+    stopwatchBtn.addEventListener("click", () => {
+      openPanelAndMaybeStart();
+    });
+
+    // Close button hides panel but timer keeps running in background
+    closeBtn.addEventListener("click", () => {
+      closePanel();
+    });
+
+    // Pause / Play toggle
+    pausePlayBtn.addEventListener("click", () => {
+      if (running) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    });
+
+    // Add 30 sec
+    add30Btn.addEventListener("click", () => {
+      add30();
+    });
+
+    // Reset
+    resetBtn.addEventListener("click", () => {
+      resetTimer();
+    });
+
+    // Initialize UI
+    render();
+    updatePausePlayIcon();
+  })();
+</script>
